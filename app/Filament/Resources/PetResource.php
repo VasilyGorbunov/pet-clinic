@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\PetType;
 use App\Filament\Resources\PetResource\Pages;
 use App\Filament\Resources\PetResource\RelationManagers;
 use App\Models\Pet;
@@ -23,7 +24,37 @@ class PetResource extends Resource
     {
         return $form
             ->schema([
-                //
+                Forms\Components\Section::make([
+                    Forms\Components\FileUpload::make('avatar')
+                        ->image()
+                        ->imageEditor(),
+                    Forms\Components\TextInput::make('name')
+                        ->required(),
+                    Forms\Components\DatePicker::make('date_of_birth')
+                        ->required()
+                        ->native(false)
+                        ->displayFormat('d M Y'),
+                    Forms\Components\Select::make('type')
+                        ->native(false)
+                        ->options(PetType::class),
+                    Forms\Components\Select::make('owner_id')
+                        ->relationship('owner', 'name')
+                        ->native(false)
+                        ->searchable()
+                        ->preload()
+                        ->createOptionForm([
+                            Forms\Components\Section::make([
+                                Forms\Components\TextInput::make('name')
+                                    ->required(),
+                                Forms\Components\TextInput::make('email')
+                                    ->email()
+                                    ->required(),
+                                Forms\Components\TextInput::make('phone')
+                                    ->tel()
+                                    ->required(),
+                            ]),
+                        ]),
+                ])
             ]);
     }
 
@@ -31,7 +62,20 @@ class PetResource extends Resource
     {
         return $table
             ->columns([
-                //
+                Tables\Columns\ImageColumn::make('avatar')
+                    ->circular(),
+                Tables\Columns\TextColumn::make('name')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('type')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('date_of_birth')
+                    ->date('d M Y')
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('owner.name')
+                    ->sortable()
+                    ->searchable(),
             ])
             ->filters([
                 //
