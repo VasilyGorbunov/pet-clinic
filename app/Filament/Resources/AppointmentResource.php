@@ -2,6 +2,7 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\AppointmentsStatus;
 use App\Filament\Resources\AppointmentResource\Pages;
 use App\Filament\Resources\AppointmentResource\RelationManagers;
 use App\Models\Appointment;
@@ -41,6 +42,10 @@ class AppointmentResource extends Resource
                         ->preload(),
                     Forms\Components\TextInput::make('description')
                         ->required(),
+                    Forms\Components\Select::make('status')
+                        ->native(false)
+                        ->options(AppointmentsStatus::class)
+                        ->visibleOn(Pages\EditAppointment::class),
                 ])
             ]);
     }
@@ -66,12 +71,32 @@ class AppointmentResource extends Resource
                     ->time()
                     ->label('From')
                     ->sortable(),
+                Tables\Columns\TextColumn::make('status')
+                    ->badge()
+                    ->sortable(),
             ])
             ->filters([
                 //
             ])
             ->actions([
+                Tables\Actions\Action::make('Confirm')
+                    ->action(function (Appointment $record) {
+                        $record->status = AppointmentsStatus::Confirmed;
+                        $record->save();
+                    })
+                    ->visible(fn (Appointment $record) => $record->status == AppointmentsStatus::Created)
+                    ->color('success')
+                    ->icon('heroicon-o-check'),
+                Tables\Actions\Action::make('Cancel')
+                    ->action(function (Appointment $record) {
+                        $record->status = AppointmentsStatus::Canceled;
+                        $record->save();
+                    })
+                    ->visible(fn (Appointment $record) => $record->status != AppointmentsStatus::Canceled)
+                    ->color('danger')
+                    ->icon('heroicon-o-x-mark'),
                 Tables\Actions\EditAction::make(),
+
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
