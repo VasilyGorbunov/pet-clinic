@@ -57,6 +57,11 @@ class User extends Authenticatable implements HasTenants, FilamentUser
         return $this->belongsToMany(Clinic::class);
     }
 
+    public function clinic(): BelongsToMany
+    {
+        return $this->clinics();
+    }
+
     public function role(): BelongsTo
     {
         return $this->belongsTo(Role::class);

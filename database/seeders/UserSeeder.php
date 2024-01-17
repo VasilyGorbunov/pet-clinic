@@ -15,8 +15,10 @@ class UserSeeder extends Seeder
     public function run(): void
     {
         User::factory()->create([
+            'name' => 'Admin',
+            'email' => 'admin@app.com',
             'role_id' => Role::whereName('admin')->first()->id,
-            'phone' => '55555534543',
+            'phone' => '(555) 555 55 55',
         ]);
     }
 }

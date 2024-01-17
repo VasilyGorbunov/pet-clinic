@@ -15,7 +15,7 @@ class ClinicSeeder extends Seeder
     public function run(): void
     {
         DB::table('clinics')->insert([
-            'name' => 'Clinic A'
+            'name' => 'Default Clinic'
         ]);
 
         Clinic::first()->users()->attach(1);
