@@ -16,7 +16,7 @@ use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Collection;
 use Laravel\Sanctum\HasApiTokens;
 
-class User extends Authenticatable implements HasTenants, FilamentUser
+class User extends Authenticatable implements FilamentUser
 {
     use HasApiTokens;
     use HasFactory;
@@ -31,6 +31,7 @@ class User extends Authenticatable implements HasTenants, FilamentUser
         'name',
         'email',
         'password',
+        'phone',
     ];
 
     /**
@@ -53,15 +54,6 @@ class User extends Authenticatable implements HasTenants, FilamentUser
         'password' => 'hashed',
     ];
 
-    public function clinics(): BelongsToMany
-    {
-        return $this->belongsToMany(Clinic::class);
-    }
-
-    public function clinic(): BelongsToMany
-    {
-        return $this->clinics();
-    }
 
     public function schedules(): HasMany
     {
@@ -77,18 +69,9 @@ class User extends Authenticatable implements HasTenants, FilamentUser
     {
         $role = auth()->user()->role->name;
         return match ($panel->getId()) {
-            'admin' => $role === 'admin' || $role === 'doctor',
-            'owner' => $role === 'admin' || $role === 'owner',
+            'admin' => $role === 'admin',
+            'doctor' => $role === 'doctor',
+            'owner' => $role === 'owner',
         };
-    }
-
-    public function canAccessTenant(Model $tenant): bool
-    {
-        return $this->clinics->contains($tenant);
-    }
-
-    public function getTenants(Panel $panel): array|Collection
-    {
-        return $this->clinics;
     }
 }
