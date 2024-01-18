@@ -7,6 +7,7 @@ use App\Filament\Resources\ScheduleResource\RelationManagers;
 use App\Models\Role;
 use App\Models\Schedule;
 use App\Models\Slot;
+use App\Models\User;
 use Carbon\Carbon;
 use Faker\Provider\Text;
 use Filament\Facades\Filament;
@@ -35,10 +36,9 @@ class ScheduleResource extends Resource
                         ->required(),
                     Forms\Components\Select::make('owner_id')
                         ->native(false)
-                        //->relationship('owner', 'name')
-                        ->options(Filament::getTenant()
-                            ->users()
-                            ->whereBelongsTo($doctorRole)
+                        ->label('Doctor')
+                        ->options(
+                            User::whereBelongsTo($doctorRole)
                             ->get()
                             ->pluck('name', 'id')
                         )
@@ -76,9 +76,9 @@ class ScheduleResource extends Resource
                 Tables\Columns\TextColumn::make('owner.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('slots.start')
+                Tables\Columns\TextColumn::make('slots')
                     ->badge()
-                    ->formatStateUsing(fn(Carbon $state) => Carbon::parse($state)->format('H::i')),
+                    ->formatStateUsing(fn (Slot $state) => $state->start->format('H:i') . ' - ' . $state->end->format('H:i')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()

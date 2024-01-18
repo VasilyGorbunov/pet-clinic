@@ -36,12 +36,6 @@ class UserResource extends Resource
                         ->relationship('role', 'name')
                         ->preload()
                         ->required(),
-                    Forms\Components\Select::make('clinics')
-                        ->native(false)
-                        ->multiple()
-                        ->relationship(null, 'name')
-                        ->preload()
-                        ->required(),
                     Forms\Components\TextInput::make('password')
                         ->password()
                         ->dehydrateStateUsing(fn ($state) => Hash::make($state))
@@ -71,9 +65,6 @@ class UserResource extends Resource
                     ->badge()
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('clinics.name')
-                    ->badge()
-                    ->searchable(),
                 Tables\Columns\TextColumn::make('updated_at')
                     ->dateTime('d M Y H:i:s')
                     ->sortable()
