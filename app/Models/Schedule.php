@@ -12,6 +12,10 @@ class Schedule extends Model
 {
     use HasFactory;
 
+    protected $casts = [
+        'date' => 'datetime'
+    ];
+
     public function owner(): BelongsTo
     {
         return $this->belongsTo(User::class, 'owner_id');
