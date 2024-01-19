@@ -8,7 +8,6 @@ use App\Models\Appointment;
 use App\Models\Role;
 use App\Models\Slot;
 use App\Models\User;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
@@ -49,11 +48,21 @@ class AppointmentResource extends Resource
                                 ->get()
                                 ->pluck('name', 'id');
                         })
-                        ->hidden(fn(Forms\Get $get) => blank($get('date'))),
+                        ->hidden(fn (Forms\Get $get) => blank($get('date')))
+                        ->live(),
                     Forms\Components\Select::make('slot_id')
                         ->native(false)
-                        ->relationship('slot', 'start')
-                        ->getOptionLabelFromRecordUsing(fn(Slot $record) => $record->start->format('H::i')),
+                        ->relationship(
+                            name: 'slot',
+                            titleAttribute: 'start',
+                            modifyQueryUsing: function (Builder $query, Forms\Get $get) {
+                                $doctor = User::find($get('doctor'));
+                                $query->whereHas('schedule', function (Builder $query) use ($doctor) {
+                                    $query->whereBelongsTo($doctor, 'owner');
+                                });
+                            })
+                        ->hidden(fn (Forms\Get $get) => blank($get('doctor')))
+                        ->getOptionLabelFromRecordUsing(fn (Slot $record) => $record->start->format('H::i')),
                     Forms\Components\TextInput::make('description')
                         ->required(),
                     Forms\Components\Select::make('status')
@@ -98,7 +107,7 @@ class AppointmentResource extends Resource
                         $record->status = AppointmentsStatus::Confirmed;
                         $record->save();
                     })
-                    ->visible(fn(Appointment $record) => $record->status == AppointmentsStatus::Created)
+                    ->visible(fn (Appointment $record) => $record->status == AppointmentsStatus::Created)
                     ->color('success')
                     ->icon('heroicon-o-check'),
                 Tables\Actions\Action::make('Cancel')
@@ -106,7 +115,7 @@ class AppointmentResource extends Resource
                         $record->status = AppointmentsStatus::Canceled;
                         $record->save();
                     })
-                    ->visible(fn(Appointment $record) => $record->status != AppointmentsStatus::Canceled)
+                    ->visible(fn (Appointment $record) => $record->status != AppointmentsStatus::Canceled)
                     ->color('danger')
                     ->icon('heroicon-o-x-mark'),
                 Tables\Actions\EditAction::make(),

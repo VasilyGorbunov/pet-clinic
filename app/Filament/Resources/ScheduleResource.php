@@ -3,21 +3,15 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\ScheduleResource\Pages;
-use App\Filament\Resources\ScheduleResource\RelationManagers;
 use App\Models\Role;
 use App\Models\Schedule;
 use App\Models\Slot;
 use App\Models\User;
-use Carbon\Carbon;
-use Faker\Provider\Text;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ScheduleResource extends Resource
 {
@@ -98,7 +92,7 @@ class ScheduleResource extends Resource
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make()
-                        ->before(fn(Schedule $record) => $record->slots()->delete()),
+                        ->before(fn (Schedule $record) => $record->slots()->delete()),
                 ]),
             ]);
     }
