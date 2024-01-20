@@ -1,42 +1,36 @@
 <?php
 
-namespace App\Filament\Resources;
+namespace App\Filament\Doctor\Resources;
 
-use App\Filament\Resources\ScheduleResource\Pages;
-use App\Models\Role;
+use App\Enums\AppointmentsStatus;
+use App\Filament\Doctor\Resources\ScheduleResource\Pages;
+use App\Filament\Doctor\Resources\ScheduleResource\RelationManagers;
 use App\Models\Schedule;
 use App\Models\Slot;
 use App\Models\User;
+use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ScheduleResource extends Resource
 {
     protected static ?string $model = Schedule::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-clock';
 
     public static function form(Form $form): Form
     {
-        $doctorRole = Role::whereName('doctor')->first();
         return $form
             ->schema([
                 Forms\Components\Section::make([
                     Forms\Components\DatePicker::make('date')
                         ->native(false)
                         ->closeOnDateSelection()
-                        ->required(),
-                    Forms\Components\Select::make('owner_id')
-                        ->native(false)
-                        ->label('Doctor')
-                        ->options(
-                            User::whereBelongsTo($doctorRole)
-                            ->get()
-                            ->pluck('name', 'id')
-                        )
                         ->required(),
                     Forms\Components\Repeater::make('slots')
                         ->relationship()
@@ -68,12 +62,9 @@ class ScheduleResource extends Resource
                     ->date()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
-                Tables\Columns\TextColumn::make('owner.name')
-                    ->numeric()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('slots')
                     ->badge()
-                    ->formatStateUsing(fn (Slot $state) => $state->start->format('H:i') . ' - ' . $state->end->format('H:i')),
+                    ->formatStateUsing(fn (Slot $state) => $state->formatted_time),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -88,12 +79,10 @@ class ScheduleResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make()
-                        ->before(fn (Schedule $record) => $record->slots()->delete()),
+                    Tables\Actions\DeleteBulkAction::make(),
                 ]),
             ]);
     }

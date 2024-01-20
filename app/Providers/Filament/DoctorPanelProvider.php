@@ -2,6 +2,7 @@
 
 namespace App\Providers\Filament;
 
+use App\Http\Middleware\AssignGlobalScopes;
 use Filament\Http\Middleware\Authenticate;
 use Filament\Http\Middleware\DisableBladeIconComponents;
 use Filament\Http\Middleware\DispatchServingFilamentEvent;
@@ -25,8 +26,10 @@ class DoctorPanelProvider extends PanelProvider
         return $panel
             ->id('doctor')
             ->path('doctor')
+            ->login()
+            ->passwordReset()
             ->colors([
-                'primary' => Color::Amber,
+                'primary' => Color::Sky,
             ])
             ->discoverResources(in: app_path('Filament/Doctor/Resources'), for: 'App\\Filament\\Doctor\\Resources')
             ->discoverPages(in: app_path('Filament/Doctor/Pages'), for: 'App\\Filament\\Doctor\\Pages')
@@ -48,6 +51,7 @@ class DoctorPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
+                AssignGlobalScopes::class,
             ])
             ->authMiddleware([
                 Authenticate::class,

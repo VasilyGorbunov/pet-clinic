@@ -65,7 +65,7 @@ class AppointmentResource extends Resource
                                 });
                             })
                         ->hidden(fn (Forms\Get $get) => blank($get('doctor')))
-                        ->getOptionLabelFromRecordUsing(fn (Slot $record) => $record->start->format('H::i')),
+                        ->getOptionLabelFromRecordUsing(fn (Slot $record) => $record->formatted_time),
                     Forms\Components\TextInput::make('description')
                         ->required(),
                     Forms\Components\Select::make('status')
