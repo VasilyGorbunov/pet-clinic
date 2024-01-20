@@ -14,6 +14,10 @@ class EditAppointment extends EditRecord
     {
         return [
             Actions\DeleteAction::make(),
+            Actions\Action::make('reload')
+                ->outlined()
+                ->icon('heroicon-o-arrow-path')
+                ->action(fn() => $this->fillForm()),
         ];
     }
 

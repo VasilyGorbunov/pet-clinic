@@ -11,6 +11,14 @@ class Appointment extends Model
 {
     use HasFactory;
 
+    protected static $unguarded = false;
+
+    protected $fillable = [
+        'pet_id',
+        'slot_id',
+        'description',
+    ];
+
     protected $casts = [
         'status' => AppointmentsStatus::class,
     ];

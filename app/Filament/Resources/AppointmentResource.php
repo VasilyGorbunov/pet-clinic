@@ -37,7 +37,8 @@ class AppointmentResource extends Resource
                         ->native(false)
                         ->closeOnDateSelection()
                         ->required()
-                        ->live(),
+                        ->live()
+                        ->afterStateUpdated(fn (Forms\Set $set) => $set('doctor', null)),
                     Forms\Components\Select::make('doctor')
                         ->native(false)
                         ->options(function (Forms\Get $get) use ($doctorRole) {
@@ -49,9 +50,11 @@ class AppointmentResource extends Resource
                                 ->pluck('name', 'id');
                         })
                         ->hidden(fn (Forms\Get $get) => blank($get('date')))
-                        ->live(),
+                        ->live()
+                        ->afterStateUpdated(fn (Forms\Set $set) => $set('slot_id', null)),
                     Forms\Components\Select::make('slot_id')
                         ->native(false)
+                        ->required()
                         ->relationship(
                             name: 'slot',
                             titleAttribute: 'start',
@@ -83,16 +86,15 @@ class AppointmentResource extends Resource
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('date')
+                Tables\Columns\TextColumn::make('slot.schedule.owner.name')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('slot.schedule.date')
                     ->date('d M Y')
                     ->sortable(),
-                Tables\Columns\TextColumn::make('start')
-                    ->time()
-                    ->label('From')
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('end')
-                    ->time()
-                    ->label('From')
+                Tables\Columns\TextColumn::make('slot.formatted_time')
+                    ->label('Time')
+                    ->badge()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
