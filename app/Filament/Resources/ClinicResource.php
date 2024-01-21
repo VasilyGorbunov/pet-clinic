@@ -17,11 +17,13 @@ class ClinicResource extends Resource
 {
     protected static ?string $model = Clinic::class;
 
-    protected static ?string $navigationIcon = 'heroicon-o-rectangle-stack';
+    protected static ?string $navigationIcon = 'heroicon-o-building-office';
+    protected static ?int $navigationSort = 0;
 
     public static function form(Form $form): Form
     {
         return $form
+            ->columns(1)
             ->schema([
                 Forms\Components\TextInput::make('name')
                     ->required(),
