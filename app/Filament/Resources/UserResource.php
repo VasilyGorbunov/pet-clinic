@@ -36,6 +36,12 @@ class UserResource extends Resource
                         ->relationship('role', 'name')
                         ->preload()
                         ->required(),
+                    Forms\Components\Select::make('clinic_id')
+                        ->native(false)
+                        ->relationship('clinics', 'name')
+                        ->multiple()
+                        ->preload()
+                        ->searchable(),
                     Forms\Components\TextInput::make('password')
                         ->password()
                         ->dehydrateStateUsing(fn ($state) => Hash::make($state))
