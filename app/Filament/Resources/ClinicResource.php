@@ -10,8 +10,6 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ClinicResource extends Resource
 {
@@ -63,6 +61,13 @@ class ClinicResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make()
+                    ->before(function (Clinic $record) {
+                        $record->users()->detach();
+                        $record->pets()->detach();
+                        $record->appointments()->delete();
+                        $record->schedules()->delete();
+                    })
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([

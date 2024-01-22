@@ -67,6 +67,10 @@ class UserResource extends Resource
                     ->dateTime('d M Y H:i:s')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('clinics.name')
+                    ->badge()
+                    ->sortable()
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('role.name')
                     ->badge()
                     ->searchable()

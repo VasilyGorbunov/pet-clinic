@@ -37,6 +37,11 @@ class PetResource extends Resource
                     Forms\Components\Select::make('type')
                         ->native(false)
                         ->options(PetType::class),
+                    Forms\Components\Select::make('clinic_id')
+                        ->relationship('clinics', 'name')
+                        ->multiple()
+                        ->preload()
+                        ->searchable(),
                     Forms\Components\Select::make('owner_id')
                         ->relationship('owner', 'name')
                         ->native(false)
@@ -56,6 +61,10 @@ class PetResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('type')
+                    ->sortable()
+                    ->searchable(),
+                Tables\Columns\TextColumn::make('clinics.name')
+                    ->badge()
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('date_of_birth')
