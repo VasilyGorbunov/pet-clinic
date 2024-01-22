@@ -2,16 +2,20 @@
 
 namespace App\Filament\Resources;
 
+use App\Enums\DaysOfTheWeek;
 use App\Filament\Resources\ScheduleResource\Pages;
+use App\Models\Clinic;
 use App\Models\Role;
 use App\Models\Schedule;
 use App\Models\Slot;
 use App\Models\User;
 use Filament\Forms;
 use Filament\Forms\Form;
+use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Support\Collection;
 
 class ScheduleResource extends Resource
 {
@@ -30,15 +34,27 @@ class ScheduleResource extends Resource
                         ->native(false)
                         ->closeOnDateSelection()
                         ->required(),
+                    Forms\Components\Select::make('clinic_id')
+                        ->relationship('clinic', 'name')
+                        ->preload()
+                        ->searchable()
+                        ->live()
+                        ->afterStateUpdated(fn (Set $set) => $set('owner_id', null)),
                     Forms\Components\Select::make('owner_id')
                         ->native(false)
                         ->label('Doctor')
-                        ->options(
-                            User::whereBelongsTo($doctorRole)
-                            ->get()
-                            ->pluck('name', 'id')
-                        )
-                        ->required(),
+                        ->options(function (Forms\Get $get) use($doctorRole): array|Collection {
+                            return Clinic::find($get('clinic_id'))
+                                ?->users()
+                                ->whereBelongsTo($doctorRole)
+                                ->get()
+                                ->pluck('name', 'id') ?? [];
+                        })
+                        ->required()
+                        ->live(),
+                    Forms\Components\Select::make('day_of_week')
+                        ->native(false)
+                        ->options(DaysOfTheWeek::class),
                     Forms\Components\Repeater::make('slots')
                         ->relationship()
                         ->schema([
@@ -72,6 +88,12 @@ class ScheduleResource extends Resource
                 Tables\Columns\TextColumn::make('owner.name')
                     ->numeric()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('clinic.name')
+                    ->searchable()
+                    ->sortable()
+                    ->badge(),
+                Tables\Columns\TextColumn::make('day_of_week')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('slots')
                     ->badge()
                     ->formatStateUsing(fn (Slot $state) => $state->start->format('H:i') . ' - ' . $state->end->format('H:i')),
