@@ -74,11 +74,7 @@ class ScheduleResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->groups([
-                Tables\Grouping\Group::make('date')
-                    ->collapsible(),
-            ])
-            ->defaultGroup('date')
+            ->defaultGroup(Tables\Grouping\Group::make('clinic.name')->collapsible()->titlePrefixedWithLabel(false))
             ->groupingSettingsInDropdownOnDesktop()
             ->columns([
                 Tables\Columns\TextColumn::make('date')
@@ -88,10 +84,6 @@ class ScheduleResource extends Resource
                 Tables\Columns\TextColumn::make('owner.name')
                     ->numeric()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('clinic.name')
-                    ->searchable()
-                    ->sortable()
-                    ->badge(),
                 Tables\Columns\TextColumn::make('day_of_week')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('slots')

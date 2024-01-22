@@ -43,6 +43,7 @@ class AppointmentResource extends Resource
                     Forms\Components\Select::make('doctor')
                         ->native(false)
                         ->options(function (Forms\Get $get) use ($doctorRole) {
+                            /** @phpstan-ignore-next-line  */
                             return User::whereBelongsTo($doctorRole)
                                 ->whereHas('schedules', function (Builder $query) use ($get) {
                                     $query->where('date', $get('date'));

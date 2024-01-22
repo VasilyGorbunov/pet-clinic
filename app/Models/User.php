@@ -88,6 +88,7 @@ class User extends Authenticatable implements HasTenants, FilamentUser
             'admin' => $role === 'admin',
             'doctor' => $role === 'doctor',
             'owner' => $role === 'owner',
+            default => false,
         };
     }
 }
