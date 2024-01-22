@@ -48,6 +48,7 @@ class AppointmentResource extends Resource
                         ->native(false)
                         ->closeOnDateSelection()
                         ->required()
+                        ->default(fn($record) => $record->date->format('Y-m-d'))
                         ->live()
                         ->afterStateUpdated(fn (Forms\Set $set) => $set('doctor', null)),
                     Forms\Components\Select::make('doctor')
@@ -112,8 +113,8 @@ class AppointmentResource extends Resource
                     ->label('Clinic')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('slot.schedule.date')
-                    ->date('d M Y')
+                Tables\Columns\TextColumn::make('date')
+                    ->date('Y-m-d')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('slot.formatted_time')
                     ->label('Time')
