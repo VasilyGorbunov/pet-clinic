@@ -14,6 +14,7 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Support\Carbon;
 
 class AppointmentResource extends Resource
 {
@@ -34,6 +35,15 @@ class AppointmentResource extends Resource
                         ->relationship('pet', 'name')
                         ->searchable()
                         ->preload(),
+                    Forms\Components\Select::make('clinic_id')
+                        ->relationship('clinic', 'name')
+                        ->preload()
+                        ->searchable()
+                        ->live()
+                        ->afterStateUpdated(function(Forms\Set $set) {
+                            $set('date', null);
+                            $set('doctor', null);
+                        }),
                     Forms\Components\DatePicker::make('date')
                         ->native(false)
                         ->closeOnDateSelection()
@@ -46,7 +56,9 @@ class AppointmentResource extends Resource
                             /** @phpstan-ignore-next-line  */
                             return User::whereBelongsTo($doctorRole)
                                 ->whereHas('schedules', function (Builder $query) use ($get) {
-                                    $query->where('date', $get('date'));
+                                    $dayOfWeek = Carbon::parse($get('date'))->dayOfWeek;
+                                    $query->where('day_of_week', $dayOfWeek)
+                                        ->where('clinic_id', $get('clinic_id'));
                                 })
                                 ->get()
                                 ->pluck('name', 'id');
@@ -62,8 +74,12 @@ class AppointmentResource extends Resource
                             titleAttribute: 'start',
                             modifyQueryUsing: function (Builder $query, Forms\Get $get) {
                                 $doctor = User::find($get('doctor'));
-                                $query->whereHas('schedule', function (Builder $query) use ($doctor) {
-                                    $query->whereBelongsTo($doctor, 'owner');
+                                $dayOfWeek = Carbon::parse($get('date'))->dayOfWeek;
+                                $query->whereHas('schedule', function (Builder $query) use ($doctor, $dayOfWeek, $get) {
+                                    $query
+                                        ->where('clinic_id', $get('clinic_id'))
+                                        ->where('day_of_week', $dayOfWeek)
+                                        ->whereBelongsTo($doctor, 'owner');
                                 });
                             })
                         ->hidden(fn (Forms\Get $get) => blank($get('doctor')))
@@ -89,6 +105,11 @@ class AppointmentResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('slot.schedule.owner.name')
+                    ->label('Doctor')
+                    ->searchable()
+                    ->sortable(),
+                Tables\Columns\TextColumn::make('clinic.name')
+                    ->label('Clinic')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('slot.schedule.date')
