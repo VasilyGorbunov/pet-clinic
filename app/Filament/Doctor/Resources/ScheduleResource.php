@@ -22,6 +22,7 @@ class ScheduleResource extends Resource
     protected static ?string $model = Schedule::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-clock';
+    protected static ?int $navigationSort = 2;
 
     public static function form(Form $form): Form
     {
@@ -51,20 +52,18 @@ class ScheduleResource extends Resource
     public static function table(Table $table): Table
     {
         return $table
-            ->groups([
-                Tables\Grouping\Group::make('date')
-                    ->collapsible(),
-            ])
-            ->defaultGroup('date')
+            ->defaultGroup(Tables\Grouping\Group::make('clinic.name')->collapsible()->titlePrefixedWithLabel(false))
             ->groupingSettingsInDropdownOnDesktop()
             ->columns([
                 Tables\Columns\TextColumn::make('date')
                     ->date()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
+                Tables\Columns\TextColumn::make('day_of_week')
+                    ->searchable(),
                 Tables\Columns\TextColumn::make('slots')
                     ->badge()
-                    ->formatStateUsing(fn (Slot $state) => $state->formatted_time),
+                    ->formatStateUsing(fn (Slot $state) => $state->start->format('H:i') . ' - ' . $state->end->format('H:i')),
                 Tables\Columns\TextColumn::make('created_at')
                     ->dateTime()
                     ->sortable()
@@ -79,10 +78,12 @@ class ScheduleResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
+                Tables\Actions\DeleteAction::make(),
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
-                    Tables\Actions\DeleteBulkAction::make(),
+                    Tables\Actions\DeleteBulkAction::make()
+                        ->before(fn (Schedule $record) => $record->slots()->delete()),
                 ]),
             ]);
     }

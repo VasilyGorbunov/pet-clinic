@@ -17,8 +17,10 @@ class Appointment extends Model
         'pet_id',
         'slot_id',
         'clinic_id',
+        'doctor_id',
         'description',
         'date',
+        'status',
     ];
 
     protected $casts = [
@@ -39,5 +41,10 @@ class Appointment extends Model
     public function clinic(): BelongsTo
     {
         return $this->belongsTo(Clinic::class);
+    }
+
+    public function doctor(): BelongsTo
+    {
+        return $this->belongsTo(User::class, 'doctor_id');
     }
 }

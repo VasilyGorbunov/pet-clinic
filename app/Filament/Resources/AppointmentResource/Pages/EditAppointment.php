@@ -21,6 +21,12 @@ class EditAppointment extends EditRecord
         ];
     }
 
+    protected function mutateFormDataBeforeFill(array $data): array
+    {
+        $data['doctor'] = $this->record->slot->schedule->owner_id;
+        return $data;
+    }
+
     protected function getRedirectUrl(): ?string
     {
         return $this->getResource()::getUrl('index');
