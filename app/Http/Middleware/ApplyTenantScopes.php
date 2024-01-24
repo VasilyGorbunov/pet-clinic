@@ -18,7 +18,8 @@ class ApplyTenantScopes
      */
     public function handle(Request $request, Closure $next): Response
     {
-        Pet::addGlobalScope(fn(Builder $query) => $query->wherePivot('clinic_id', Filament::getTenant()->id));
+        Pet::addGlobalScope(fn(Builder $query) => $query->whereHas('clinics', fn(Builder $query) =>
+            $query->where('clinics.id', Filament::getTenant()->id)));
         return $next($request);
     }
 }

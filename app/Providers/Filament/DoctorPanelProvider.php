@@ -34,6 +34,7 @@ class DoctorPanelProvider extends PanelProvider
                 'primary' => Color::Sky,
             ])
             ->tenant(Clinic::class)
+            ->tenantMiddleware([ApplyTenantScopes::class], isPersistent: true)
             ->discoverResources(in: app_path('Filament/Doctor/Resources'), for: 'App\\Filament\\Doctor\\Resources')
             ->discoverPages(in: app_path('Filament/Doctor/Pages'), for: 'App\\Filament\\Doctor\\Pages')
             ->pages([
