@@ -9,18 +9,18 @@ use Illuminate\Support\Carbon;
 
 class SlotFactory extends Factory
 {
-  protected $model = Slot::class;
+    protected $model = Slot::class;
 
-  public function definition(): array
-  {
-    return [
-      'start' => Carbon::now(),
-      'end' => Carbon::now(),
-      'status' => $this->faker->word(),
-      'created_at' => Carbon::now(),
-      'updated_at' => Carbon::now(),
+    public function definition(): array
+    {
+        return [
+          'start' => Carbon::now(),
+          'end' => Carbon::now(),
+          'status' => $this->faker->word(),
+          'created_at' => Carbon::now(),
+          'updated_at' => Carbon::now(),
 
-      'schedule_id' => Schedule::factory(),
-    ];
-  }
+          'schedule_id' => Schedule::factory(),
+        ];
+    }
 }

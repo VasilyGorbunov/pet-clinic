@@ -8,7 +8,6 @@ use App\Models\Appointment;
 use App\Models\Role;
 use App\Models\Slot;
 use App\Models\User;
-use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
 use Filament\Forms\Get;
@@ -18,7 +17,6 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
-use Illuminate\Support\Collection;
 
 class AppointmentResource extends Resource
 {
@@ -79,7 +77,7 @@ class AppointmentResource extends Resource
                         // TODO: move this to the Slots Model
                         // ->options(fn () => Slots::getAvailable())
                         ->relationship(
-                            name:'slot', 
+                            name:'slot',
                             titleAttribute: 'start',
                             modifyQueryUsing: function (Builder $query, Get $get) {
                                 $doctor = User::find($get('doctor_id'));

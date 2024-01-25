@@ -6,7 +6,6 @@ use App\Models\Clinic;
 use App\Models\Pet;
 use App\Models\User;
 use Carbon\Carbon;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
 
 class PetSeeder extends Seeder

@@ -10,17 +10,17 @@ use Illuminate\Support\Carbon;
 
 class ScheduleFactory extends Factory
 {
-  protected $model = Schedule::class;
+    protected $model = Schedule::class;
 
-  public function definition(): array
-  {
-    return [
-      'created_at' => Carbon::now(),
-      'updated_at' => Carbon::now(),
-      'day_of_week' => $this->faker->word(),
+    public function definition(): array
+    {
+        return [
+          'created_at' => Carbon::now(),
+          'updated_at' => Carbon::now(),
+          'day_of_week' => $this->faker->word(),
 
-      'owner_id' => User::factory(),
-      'clinic_id' => Clinic::factory(),
-    ];
-  }
+          'owner_id' => User::factory(),
+          'clinic_id' => Clinic::factory(),
+        ];
+    }
 }

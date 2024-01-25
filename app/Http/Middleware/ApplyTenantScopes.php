@@ -2,12 +2,12 @@
 
 namespace App\Http\Middleware;
 
+use App\Models\Clinic;
 use App\Models\Pet;
 use Closure;
 use Filament\Facades\Filament;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\Request;
-use Symfony\Component\HttpFoundation\Response;
 
 class ApplyTenantScopes
 {
@@ -19,11 +19,15 @@ class ApplyTenantScopes
     public function handle(Request $request, Closure $next)
     {
         Pet::addGlobalScope(
-            fn (Builder $query) => 
-                $query->whereHas('clinics', fn (Builder $query) => 
-                    $query->where('clinics.id', Filament::getTenant()->id))
+            function (Builder $query) {
+                /**
+                 * @var Clinic $clinic
+                 */
+                $clinic = Filament::getTenant();
+                return $query->whereHas('clinics', fn(Builder $query) => $query->where('clinics.id', $clinic->id));
+                    }
         );
-        
+
         return $next($request);
     }
 }

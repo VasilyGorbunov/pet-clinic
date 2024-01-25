@@ -6,9 +6,7 @@ use App\Models\Clinic;
 use App\Models\Schedule;
 use App\Models\Slot;
 use App\Models\User;
-use Illuminate\Database\Console\Seeds\WithoutModelEvents;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\DB;
 
 class ScheduleSeeder extends Seeder
 {

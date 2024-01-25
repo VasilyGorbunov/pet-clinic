@@ -4,12 +4,10 @@ namespace App\Filament\Doctor\Resources;
 
 use App\Enums\AppointmentStatus;
 use App\Filament\Doctor\Resources\AppointmentResource\Pages;
-use App\Filament\Doctor\Resources\AppointmentResource\RelationManagers;
 use App\Models\Appointment;
-use App\Models\Pet;
+use App\Models\Clinic;
 use App\Models\Role;
 use App\Models\Slot;
-use App\Models\User;
 use Filament\Facades\Filament;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -19,7 +17,6 @@ use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 use Illuminate\Support\Carbon;
 
 class AppointmentResource extends Resource
@@ -32,7 +29,6 @@ class AppointmentResource extends Resource
 
     public static function form(Form $form): Form
     {
-        $doctorRole = Role::whereName('doctor')->first();
 
         return $form
             ->schema([
@@ -58,8 +54,12 @@ class AppointmentResource extends Resource
                             $doctor = Filament::auth()->user();
                             $dayOfTheWeek = Carbon::parse($get('date'))->dayOfWeek;
                             return Slot::whereHas('schedule', function (Builder $query) use ($doctor, $dayOfTheWeek) {
+                                /**
+                                 * @var Clinic $clinic
+                                 */
+                                $clinic = Filament::getTenant();
                                 $query
-                                    ->where('clinic_id', Filament::getTenant()->id)
+                                    ->where('clinic_id', $clinic->id)
                                     ->where('day_of_week', $dayOfTheWeek)
                                     ->whereBelongsTo($doctor, 'owner');
                             })
