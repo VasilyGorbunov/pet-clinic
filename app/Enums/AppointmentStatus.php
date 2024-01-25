@@ -5,7 +5,7 @@ namespace App\Enums;
 use Filament\Support\Contracts\HasColor;
 use Filament\Support\Contracts\HasLabel;
 
-enum AppointmentsStatus: string implements HasLabel, HasColor
+enum AppointmentStatus: string implements HasLabel, HasColor
 {
     case Created = 'created';
     case Confirmed = 'confirmed';
@@ -16,7 +16,7 @@ enum AppointmentsStatus: string implements HasLabel, HasColor
         return $this->name;
     }
 
-    public function getColor(): string|array|null
+    public function getColor(): string | array | null
     {
         return match ($this) {
             self::Created => 'warning',

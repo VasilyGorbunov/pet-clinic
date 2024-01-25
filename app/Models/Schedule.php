@@ -13,7 +13,7 @@ class Schedule extends Model
     use HasFactory;
 
     protected $casts = [
-        'day_of_week' => DaysOfTheWeek::class,
+        'day_of_week' => DaysOfTheWeek::class
     ];
 
     public function owner(): BelongsTo

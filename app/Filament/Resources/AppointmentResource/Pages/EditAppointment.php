@@ -3,9 +3,13 @@
 namespace App\Filament\Resources\AppointmentResource\Pages;
 
 use App\Filament\Resources\AppointmentResource;
+use App\Models\Appointment;
 use Filament\Actions;
 use Filament\Resources\Pages\EditRecord;
 
+/**
+ * @property Appointment $record
+ */
 class EditAppointment extends EditRecord
 {
     protected static string $resource = AppointmentResource::class;
@@ -14,10 +18,10 @@ class EditAppointment extends EditRecord
     {
         return [
             Actions\DeleteAction::make(),
-            Actions\Action::make('reload')
+            Actions\Action::make('relaod')
                 ->outlined()
                 ->icon('heroicon-o-arrow-path')
-                ->action(fn() => $this->fillForm()),
+                ->action(fn () => $this->fillForm())
         ];
     }
 

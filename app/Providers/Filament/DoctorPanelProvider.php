@@ -55,8 +55,7 @@ class DoctorPanelProvider extends PanelProvider
                 SubstituteBindings::class,
                 DisableBladeIconComponents::class,
                 DispatchServingFilamentEvent::class,
-                AssignGlobalScopes::class,
-                ApplyTenantScopes::class,
+                AssignGlobalScopes::class
             ])
             ->authMiddleware([
                 Authenticate::class,

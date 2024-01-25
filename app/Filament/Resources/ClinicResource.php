@@ -10,12 +10,15 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class ClinicResource extends Resource
 {
     protected static ?string $model = Clinic::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-building-office';
+
     protected static ?int $navigationSort = 0;
 
     public static function form(Form $form): Form
@@ -73,16 +76,19 @@ class ClinicResource extends Resource
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make(),
             ]);
     }
-
+    
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-
+    
     public static function getPages(): array
     {
         return [
@@ -90,5 +96,5 @@ class ClinicResource extends Resource
             'create' => Pages\CreateClinic::route('/create'),
             'edit' => Pages\EditClinic::route('/{record}/edit'),
         ];
-    }
+    }    
 }

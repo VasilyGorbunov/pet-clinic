@@ -2,35 +2,31 @@
 
 namespace App\Models;
 
-use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Casts\Attribute;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Carbon;
 
-/**
- * @property string $formatted_time
- */
 class Slot extends Model
 {
     use HasFactory;
 
     protected $casts = [
         'start' => 'datetime',
-        'end' => 'datetime',
+        'end' => 'datetime'
     ];
 
-
     /**
-     * @return Attribute
+     * @return Attribute<string, never>
      */
     protected function formattedTime(): Attribute
     {
         return Attribute::make(
-            get: fn($value, array $attributes) =>
-                Carbon::parse($attributes['start'])->format("H:i") . ' - ' .
-                Carbon::parse($attributes['end'])->format("H:i")
+            get: fn ($value, array $attributes) => 
+                Carbon::parse($attributes['start'])->format('h:i A') . ' - ' .
+                Carbon::parse($attributes['end'])->format('h:i A')
         );
     }
 
@@ -41,6 +37,6 @@ class Slot extends Model
 
     public function schedule(): BelongsTo
     {
-        return $this->belongsTo(Schedule::class, 'schedule_id');
+        return $this->belongsTo(Schedule::class);
     }
 }

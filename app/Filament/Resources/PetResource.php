@@ -2,7 +2,6 @@
 
 namespace App\Filament\Resources;
 
-use App\Enums\PetType;
 use App\Filament\Resources\PetResource\Pages;
 use App\Models\Pet;
 use Filament\Forms;
@@ -10,6 +9,7 @@ use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
+use App\Enums\PetType;
 use Illuminate\Support\Facades\Storage;
 
 class PetResource extends Resource
@@ -17,6 +17,7 @@ class PetResource extends Resource
     protected static ?string $model = Pet::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-heart';
+
     protected static ?int $navigationSort = 3;
 
     public static function form(Form $form): Form
@@ -30,10 +31,10 @@ class PetResource extends Resource
                     Forms\Components\TextInput::make('name')
                         ->required(),
                     Forms\Components\DatePicker::make('date_of_birth')
-                        ->required()
                         ->native(false)
+                        ->required()
                         ->closeOnDateSelection()
-                        ->displayFormat('d M Y'),
+                        ->displayFormat('M d Y'),
                     Forms\Components\Select::make('type')
                         ->native(false)
                         ->options(PetType::class),
@@ -46,7 +47,7 @@ class PetResource extends Resource
                         ->relationship('owner', 'name')
                         ->native(false)
                         ->searchable()
-                        ->preload(),
+                        ->preload()
                 ])
             ]);
     }
@@ -64,15 +65,16 @@ class PetResource extends Resource
                     ->sortable()
                     ->searchable(),
                 Tables\Columns\TextColumn::make('clinics.name')
-                    ->badge()
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->badge(),
                 Tables\Columns\TextColumn::make('date_of_birth')
-                    ->date('d M Y')
+                    ->date('M d Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('owner.name')
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+
             ])
             ->filters([
                 //
@@ -81,13 +83,17 @@ class PetResource extends Resource
                 Tables\Actions\EditAction::make(),
                 Tables\Actions\DeleteAction::make()
                     ->before(function (Pet $record) {
+                        // Delete file
                         Storage::delete('public/' . $record->avatar);
-                    }),
+                    })
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make(),
             ]);
     }
 

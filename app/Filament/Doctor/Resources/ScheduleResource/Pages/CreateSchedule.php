@@ -14,6 +14,7 @@ class CreateSchedule extends CreateRecord
     protected function mutateFormDataBeforeCreate(array $data): array
     {
         $data['owner_id'] = Filament::auth()->user()->id;
+
         return $data;
     }
 

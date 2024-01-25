@@ -3,6 +3,7 @@
 namespace App\Models;
 
 // use Illuminate\Contracts\Auth\MustVerifyEmail;
+
 use Filament\Models\Contracts\FilamentUser;
 use Filament\Models\Contracts\HasTenants;
 use Filament\Panel;
@@ -31,8 +32,7 @@ class User extends Authenticatable implements HasTenants, FilamentUser
         'name',
         'email',
         'password',
-        'phone',
-        'clinic_id'
+        'phone'
     ];
 
     /**
@@ -55,15 +55,14 @@ class User extends Authenticatable implements HasTenants, FilamentUser
         'password' => 'hashed',
     ];
 
+    public function role(): BelongsTo
+    {
+        return $this->belongsTo(Role::class);
+    }
 
     public function schedules(): HasMany
     {
         return $this->hasMany(Schedule::class, 'owner_id');
-    }
-
-    public function role(): BelongsTo
-    {
-        return $this->belongsTo(Role::class);
     }
 
     public function clinics(): BelongsToMany
@@ -71,24 +70,25 @@ class User extends Authenticatable implements HasTenants, FilamentUser
         return $this->belongsToMany(Clinic::class);
     }
 
-    public function canAccessTenant(Model $tenant): bool
-    {
-        return $this->clinics->contains($tenant);
-    }
-
     public function getTenants(Panel $panel): array|Collection
     {
         return $this->clinics;
     }
 
+    public function canAccessTenant(Model $tenant): bool
+    {
+        return $this->clinics->contains($tenant);
+    }
+
     public function canAccessPanel(Panel $panel): bool
     {
         $role = auth()->user()->role->name;
-        return match ($panel->getId()) {
+
+        return match($panel->getId()) {
             'admin' => $role === 'admin',
             'doctor' => $role === 'doctor',
             'owner' => $role === 'owner',
-            default => false,
+            default => false
         };
     }
 }

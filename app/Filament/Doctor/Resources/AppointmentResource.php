@@ -2,10 +2,11 @@
 
 namespace App\Filament\Doctor\Resources;
 
-use App\Enums\AppointmentsStatus;
+use App\Enums\AppointmentStatus;
 use App\Filament\Doctor\Resources\AppointmentResource\Pages;
 use App\Filament\Doctor\Resources\AppointmentResource\RelationManagers;
 use App\Models\Appointment;
+use App\Models\Pet;
 use App\Models\Role;
 use App\Models\Slot;
 use App\Models\User;
@@ -26,6 +27,7 @@ class AppointmentResource extends Resource
     protected static ?string $model = Appointment::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-calendar-days';
+
     protected static ?int $navigationSort = 1;
 
     public static function form(Form $form): Form
@@ -36,16 +38,18 @@ class AppointmentResource extends Resource
             ->schema([
                 Forms\Components\Section::make([
                     Forms\Components\Select::make('pet_id')
-                        ->required()
                         ->relationship('pet', 'name')
+                        //->options(fn () => Pet::pluck('name', 'id'))
                         ->searchable()
-                        ->preload(),
+                        ->preload()
+                        ->required(),
                     Forms\Components\DatePicker::make('date')
                         ->native(false)
+                        ->displayFormat('M d, Y')
                         ->closeOnDateSelection()
                         ->required()
                         ->live()
-                        ->afterStateUpdated(fn (Forms\Set $set) => $set('slot_id', null)),
+                        ->afterStateUpdated(fn (Set $set) => $set('slot_id', null)),
                     Forms\Components\Select::make('slot_id')
                         ->native(false)
                         ->required()
@@ -54,14 +58,14 @@ class AppointmentResource extends Resource
                         ->options(function (Get $get) {
                             $doctor = Filament::auth()->user();
                             $dayOfTheWeek = Carbon::parse($get('date'))->dayOfWeek;
-                            return Slot::whereHas('schedule', function (Builder $query) use ($doctor, $dayOfTheWeek, $get) {
+                            return Slot::whereHas('schedule', function (Builder $query) use ($doctor, $dayOfTheWeek) {
                                 $query
                                     ->where('clinic_id', Filament::getTenant()->id)
                                     ->where('day_of_week', $dayOfTheWeek)
                                     ->whereBelongsTo($doctor, 'owner');
                             })
-                                ->get()
-                                ->pluck('formatted_time', 'id');
+                            ->get()
+                            ->pluck('formatted_time', 'id');
                         })
                         ->hidden(fn (Get $get) => blank($get('date')))
                         ->live(),
@@ -69,8 +73,8 @@ class AppointmentResource extends Resource
                         ->required(),
                     Forms\Components\Select::make('status')
                         ->native(false)
-                        ->options(AppointmentsStatus::class)
-                        ->visibleOn(Pages\EditAppointment::class),
+                        ->options(AppointmentStatus::class)
+                        ->visibleOn(Pages\EditAppointment::class)
                 ])
             ]);
     }
@@ -85,12 +89,16 @@ class AppointmentResource extends Resource
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()
                     ->sortable(),
+                Tables\Columns\TextColumn::make('doctor.name')
+                    ->label('Doctor')
+                    ->searchable()
+                    ->sortable(),
                 Tables\Columns\TextColumn::make('clinic.name')
                     ->label('Clinic')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('date')
-                    ->date('Y-m-d')
+                    ->date('M d, Y')
                     ->sortable(),
                 Tables\Columns\TextColumn::make('slot.formatted_time')
                     ->label('Time')
@@ -98,7 +106,7 @@ class AppointmentResource extends Resource
                     ->sortable(),
                 Tables\Columns\TextColumn::make('status')
                     ->badge()
-                    ->sortable(),
+                    ->sortable()
             ])
             ->filters([
                 //
@@ -106,37 +114,39 @@ class AppointmentResource extends Resource
             ->actions([
                 Tables\Actions\Action::make('Confirm')
                     ->action(function (Appointment $record) {
-                        $record->status = AppointmentsStatus::Confirmed;
+                        $record->status = AppointmentStatus::Confirmed;
                         $record->save();
                     })
-                    ->visible(fn (Appointment $record) => $record->status == AppointmentsStatus::Created)
+                    ->visible(fn (Appointment $record) => $record->status == AppointmentStatus::Created)
                     ->color('success')
                     ->icon('heroicon-o-check'),
                 Tables\Actions\Action::make('Cancel')
                     ->action(function (Appointment $record) {
-                        $record->status = AppointmentsStatus::Canceled;
+                        $record->status = AppointmentStatus::Canceled;
                         $record->save();
                     })
-                    ->visible(fn (Appointment $record) => $record->status != AppointmentsStatus::Canceled)
+                    ->visible(fn (Appointment $record) => $record->status != AppointmentStatus::Canceled)
                     ->color('danger')
                     ->icon('heroicon-o-x-mark'),
                 Tables\Actions\EditAction::make(),
-
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make(),
             ]);
     }
-
+    
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-
+    
     public static function getPages(): array
     {
         return [
@@ -144,5 +154,5 @@ class AppointmentResource extends Resource
             'create' => Pages\CreateAppointment::route('/create'),
             'edit' => Pages\EditAppointment::route('/{record}/edit'),
         ];
-    }
+    }    
 }

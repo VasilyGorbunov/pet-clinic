@@ -1,5 +1,0 @@
-./vendor/bin/pint
-
-composer require nunomaduro/larastan:^2.0 --dev
-./vendor/bin/phpstan analyze --memory-limit=2G
-

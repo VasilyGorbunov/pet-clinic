@@ -2,7 +2,7 @@
 
 namespace App\Models;
 
-use App\Enums\AppointmentsStatus;
+use App\Enums\AppointmentStatus;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
@@ -13,18 +13,18 @@ class Appointment extends Model
 
     protected static $unguarded = false;
 
-    protected $fillable = [
+    public $fillable = [
         'pet_id',
         'slot_id',
         'clinic_id',
         'doctor_id',
-        'description',
         'date',
-        'status',
+        'description',
+        'status'
     ];
 
     protected $casts = [
-        'status' => AppointmentsStatus::class,
+        'status' => AppointmentStatus::class,
         'date' => 'datetime'
     ];
 

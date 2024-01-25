@@ -16,6 +16,7 @@ class UserResource extends Resource
     protected static ?string $model = User::class;
 
     protected static ?string $navigationIcon = 'heroicon-o-users';
+
     protected static ?string $navigationGroup = 'Settings';
 
     public static function form(Form $form): Form
@@ -33,11 +34,10 @@ class UserResource extends Resource
                         ->required(),
                     Forms\Components\Select::make('role_id')
                         ->native(false)
-                        ->relationship('role', 'name')
                         ->preload()
+                        ->relationship('role', 'name')
                         ->required(),
                     Forms\Components\Select::make('clinic_id')
-                        ->native(false)
                         ->relationship('clinics', 'name')
                         ->multiple()
                         ->preload()
@@ -47,7 +47,7 @@ class UserResource extends Resource
                         ->dehydrateStateUsing(fn ($state) => Hash::make($state))
                         ->dehydrated(fn ($state) => filled($state))
                         ->required(fn (string $context): bool => $context === 'create'),
-                ]),
+                ])
             ]);
     }
 
@@ -64,19 +64,19 @@ class UserResource extends Resource
                 Tables\Columns\TextColumn::make('phone')
                     ->searchable(),
                 Tables\Columns\TextColumn::make('created_at')
-                    ->dateTime('d M Y H:i:s')
+                    ->dateTime()
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
                 Tables\Columns\TextColumn::make('clinics.name')
-                    ->badge()
                     ->sortable()
-                    ->searchable(),
+                    ->searchable()
+                    ->badge(),
                 Tables\Columns\TextColumn::make('role.name')
                     ->badge()
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('updated_at')
-                    ->dateTime('d M Y H:i:s')
+                    ->dateTime('M d Y h:i A')
                     ->sortable()
                     ->toggleable(isToggledHiddenByDefault: true),
             ])
@@ -85,12 +85,15 @@ class UserResource extends Resource
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
-                Tables\Actions\DeleteAction::make(),
+                Tables\Actions\DeleteAction::make()
             ])
             ->bulkActions([
                 Tables\Actions\BulkActionGroup::make([
                     Tables\Actions\DeleteBulkAction::make(),
                 ]),
+            ])
+            ->emptyStateActions([
+                Tables\Actions\CreateAction::make(),
             ]);
     }
 
