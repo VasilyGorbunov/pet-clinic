@@ -88,10 +88,6 @@ class AppointmentResource extends Resource
                 Tables\Columns\TextColumn::make('description')
                     ->searchable()
                     ->sortable(),
-                Tables\Columns\TextColumn::make('doctor.name')
-                    ->label('Doctor')
-                    ->searchable()
-                    ->sortable(),
                 Tables\Columns\TextColumn::make('clinic.name')
                     ->label('Clinic')
                     ->searchable()
