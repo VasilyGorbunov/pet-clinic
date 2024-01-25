@@ -39,7 +39,6 @@ class AppointmentResource extends Resource
                 Forms\Components\Section::make([
                     Forms\Components\Select::make('pet_id')
                         ->relationship('pet', 'name')
-                        //->options(fn () => Pet::pluck('name', 'id'))
                         ->searchable()
                         ->preload()
                         ->required(),
@@ -139,14 +138,14 @@ class AppointmentResource extends Resource
                 Tables\Actions\CreateAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -154,5 +153,5 @@ class AppointmentResource extends Resource
             'create' => Pages\CreateAppointment::route('/create'),
             'edit' => Pages\EditAppointment::route('/{record}/edit'),
         ];
-    }    
+    }
 }

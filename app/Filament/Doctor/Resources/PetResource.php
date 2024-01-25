@@ -2,6 +2,7 @@
 
 namespace App\Filament\Doctor\Resources;
 
+use App\Enums\PetType;
 use App\Filament\Doctor\Resources\PetResource\Pages;
 use App\Filament\Doctor\Resources\PetResource\RelationManagers;
 use App\Models\Pet;
@@ -91,14 +92,14 @@ class PetResource extends Resource
                 Tables\Actions\CreateAction::make(),
             ]);
     }
-    
+
     public static function getRelations(): array
     {
         return [
             //
         ];
     }
-    
+
     public static function getPages(): array
     {
         return [
@@ -106,5 +107,5 @@ class PetResource extends Resource
             'create' => Pages\CreatePet::route('/create'),
             'edit' => Pages\EditPet::route('/{record}/edit'),
         ];
-    }    
+    }
 }

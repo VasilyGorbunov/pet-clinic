@@ -18,6 +18,8 @@ class DatabaseSeeder extends Seeder
             UserSeeder::class,
             ClinicSeeder::class,
             ClinicUserSeeder::class,
+            ScheduleSeeder::class,
+            PetSeeder::class,
         ]);
     }
 }
