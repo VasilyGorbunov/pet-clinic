@@ -74,22 +74,14 @@ class AppointmentResource extends Resource
                     Forms\Components\Select::make('slot_id')
                         ->native(false)
                         ->required()
-                        // TODO: move this to the Slots Model
-                        // ->options(fn () => Slots::getAvailable())
-                        ->relationship(
-                            name:'slot',
-                            titleAttribute: 'start',
-                            modifyQueryUsing: function (Builder $query, Get $get) {
-                                $doctor = User::find($get('doctor_id'));
-                                $dayOfTheWeek = Carbon::parse($get('date'))->dayOfWeek;
-                                $query->whereHas('schedule', function (Builder $query) use ($doctor, $dayOfTheWeek, $get) {
-                                    $query
-                                        ->where('clinic_id', $get('clinic_id'))
-                                        ->where('day_of_week', $dayOfTheWeek)
-                                        ->whereBelongsTo($doctor, 'owner');
-                                });
-                            }
-                        )
+                        ->options(function (Get $get, Slot $slot) {
+                            $doctor = User::find($get('doctor_id'));
+                            $dayOfTheWeek = Carbon::parse($get('date'))->dayOfWeek;
+                            $clinicId = $get('clinic_id');
+                            return $clinicId
+                                ? Slot::availableFor($doctor, $dayOfTheWeek, $clinicId)->get()->pluck('formatted_time', 'id')
+                                : [];
+                        })
                         ->hidden(fn (Get $get) => blank($get('doctor_id')))
                         ->getOptionLabelFromRecordUsing(fn (Slot $record) => $record->formatted_time),
                     Forms\Components\TextInput::make('description')

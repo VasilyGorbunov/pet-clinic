@@ -46,25 +46,16 @@ class AppointmentResource extends Resource
                         ->live()
                         ->afterStateUpdated(fn (Set $set) => $set('slot_id', null)),
                     Forms\Components\Select::make('slot_id')
+                        ->label('Slot')
                         ->native(false)
                         ->required()
-                        // TODO: move this to the Slots Model
-                        // ->options(fn () => Slots::getAvailable())
                         ->options(function (Get $get) {
+                            $clinic = Filament::getTenant();
                             $doctor = Filament::auth()->user();
                             $dayOfTheWeek = Carbon::parse($get('date'))->dayOfWeek;
-                            return Slot::whereHas('schedule', function (Builder $query) use ($doctor, $dayOfTheWeek) {
-                                /**
-                                 * @var Clinic $clinic
-                                 */
-                                $clinic = Filament::getTenant();
-                                $query
-                                    ->where('clinic_id', $clinic->id)
-                                    ->where('day_of_week', $dayOfTheWeek)
-                                    ->whereBelongsTo($doctor, 'owner');
-                            })
-                            ->get()
-                            ->pluck('formatted_time', 'id');
+                            return Slot::availableFor($doctor, $dayOfTheWeek, $clinic->id)
+                                ->get()
+                                ->pluck('formatted_time', 'id');
                         })
                         ->hidden(fn (Get $get) => blank($get('date')))
                         ->live(),

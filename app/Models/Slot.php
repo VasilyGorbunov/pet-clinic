@@ -31,9 +31,14 @@ class Slot extends Model
         );
     }
 
-    public function scopeAvailable(Builder $query): void
+    public function scopeAvailableFor(Builder $query, User $doctor, int $dayOfTheWeek, int $clinicId): void
     {
-
+        $query->whereHas('schedule', function (Builder $query) use ($doctor, $dayOfTheWeek, $clinicId) {
+            $query
+                ->where('clinic_id', $clinicId)
+                ->where('day_of_week', $dayOfTheWeek)
+                ->whereBelongsTo($doctor, 'owner');
+        });
     }
 
     public function appointment(): HasMany
