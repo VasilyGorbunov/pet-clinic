@@ -21,4 +21,9 @@ class EditAppointment extends EditRecord
     {
         return $this->getResource()::getUrl('index');
     }
+
+    public function hasCombinedRelationManagerTabsWithContent(): bool
+    {
+        return false;
+    }
 }

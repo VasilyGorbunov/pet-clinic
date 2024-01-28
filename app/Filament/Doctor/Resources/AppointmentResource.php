@@ -4,6 +4,7 @@ namespace App\Filament\Doctor\Resources;
 
 use App\Enums\AppointmentStatus;
 use App\Filament\Doctor\Resources\AppointmentResource\Pages;
+use App\Filament\Doctor\Resources\AppointmentResource\RelationManagers\NotesRelationManager;
 use App\Models\Appointment;
 use App\Models\Clinic;
 use App\Models\Role;
@@ -41,7 +42,8 @@ class AppointmentResource extends Resource
                         ->required()
                         ->helperText(fn() => Filament::getTenant()->pets->isEmpty()
                             ? new HtmlString('<span class="text-sm text-danger-600">No pets available</span>')
-                            : ''),
+                            : '')
+                        ->columnSpanFull(),
                     Forms\Components\DatePicker::make('date')
                         ->native(false)
                         ->displayFormat('M d, Y')
@@ -69,7 +71,7 @@ class AppointmentResource extends Resource
                         ->native(false)
                         ->options(AppointmentStatus::class)
                         ->visibleOn(Pages\EditAppointment::class)
-                ])
+                ])->columns(2)
             ]);
     }
 
@@ -129,9 +131,10 @@ class AppointmentResource extends Resource
     public static function getRelations(): array
     {
         return [
-            //
+            NotesRelationManager::class,
         ];
     }
+
 
     public static function getPages(): array
     {
