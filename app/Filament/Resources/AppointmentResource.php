@@ -90,7 +90,14 @@ class AppointmentResource extends Resource
                                 : [];
                         })
                         ->hidden(fn (Get $get) => blank($get('doctor_id')))
-                        ->getOptionLabelFromRecordUsing(fn (Slot $record) => $record->formatted_time),
+                        ->getOptionLabelFromRecordUsing(fn (Slot $record) => $record->formatted_time)
+                        ->live()
+                        ->helperText(function ($component) {
+                            if(!$component->getOptions()) {
+                                return new HtmlString('<span class="text-sm text-danger-600">No slots available</span>');
+                            }
+                            return '';
+                        }),
                     Forms\Components\TextInput::make('description')
                         ->required(),
                     Forms\Components\Select::make('status')

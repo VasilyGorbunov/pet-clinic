@@ -18,6 +18,7 @@ use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
+use Illuminate\Support\HtmlString;
 
 class AppointmentResource extends Resource
 {
@@ -37,7 +38,10 @@ class AppointmentResource extends Resource
                         ->relationship('pet', 'name')
                         ->searchable()
                         ->preload()
-                        ->required(),
+                        ->required()
+                        ->helperText(fn() => Filament::getTenant()->pets->isEmpty()
+                            ? new HtmlString('<span class="text-sm text-danger-600">No pets available</span>')
+                            : ''),
                     Forms\Components\DatePicker::make('date')
                         ->native(false)
                         ->displayFormat('M d, Y')
@@ -77,10 +81,6 @@ class AppointmentResource extends Resource
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('description')
-                    ->searchable()
-                    ->sortable(),
-                Tables\Columns\TextColumn::make('clinic.name')
-                    ->label('Clinic')
                     ->searchable()
                     ->sortable(),
                 Tables\Columns\TextColumn::make('date')
@@ -140,5 +140,15 @@ class AppointmentResource extends Resource
             'create' => Pages\CreateAppointment::route('/create'),
             'edit' => Pages\EditAppointment::route('/{record}/edit'),
         ];
+    }
+
+    public static function getNavigationBadge(): ?string
+    {
+        return static::getModel()::new()->count();
+    }
+
+    public static function getNavigationBadgeColor(): string|array|null
+    {
+        return 'warning';
     }
 }
