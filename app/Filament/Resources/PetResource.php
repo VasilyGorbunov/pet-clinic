@@ -3,6 +3,7 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PetResource\Pages;
+use App\Models\Clinic;
 use App\Models\Pet;
 use Filament\Forms;
 use Filament\Forms\Form;
@@ -77,7 +78,11 @@ class PetResource extends Resource
 
             ])
             ->filters([
-                //
+                Tables\Filters\SelectFilter::make('clinic_id')
+                    ->label('Clinic')
+                    ->relationship('clinics', 'name')
+                    ->multiple()
+                    ->preload(),
             ])
             ->actions([
                 Tables\Actions\EditAction::make(),
