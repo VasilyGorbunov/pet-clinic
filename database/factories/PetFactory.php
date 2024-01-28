@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\PetType;
 use App\Models\Pet;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -14,14 +15,9 @@ class PetFactory extends Factory
     public function definition(): array
     {
         return [
-          'name' => $this->faker->name(),
-          'date_of_birth' => Carbon::now(),
-          'type' => $this->faker->word(),
-          'avatar' => $this->faker->word(),
-          'created_at' => Carbon::now(),
-          'updated_at' => Carbon::now(),
-
-          'owner_id' => User::factory(),
+            'name' => fake()->name(),
+            'date_of_birth' => fake()->date(),
+            'type' => PetType::Dog,
         ];
     }
 }
