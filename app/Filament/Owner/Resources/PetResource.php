@@ -2,17 +2,18 @@
 
 namespace App\Filament\Owner\Resources;
 
+use App\Enums\PetType;
 use App\Filament\Owner\Resources\PetResource\Pages;
-use App\Filament\Owner\Resources\PetResource\RelationManagers;
 use App\Models\Pet;
 use Filament\Facades\Filament;
-use Filament\Forms;
+use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\Select;
+use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\SoftDeletingScope;
 
 class PetResource extends Resource
 {
@@ -24,7 +25,13 @@ class PetResource extends Resource
     {
         return $form
             ->schema([
-                //
+                TextInput::make('name')
+                    ->required(),
+                DatePicker::make('date_of_birth')
+                    ->required(),
+                Select::make('type')
+                    ->options(PetType::class)
+                    ->required(),
             ]);
     }
 
@@ -32,7 +39,7 @@ class PetResource extends Resource
     {
         $owner = Filament::auth()->user();
         return $table
-            ->modifyQueryUsing(fn(Builder $query) => $query->owner($owner))
+            ->modifyQueryUsing(fn (Builder $query) => $query->owner($owner))
             ->columns([
                 Tables\Columns\TextColumn::make('name'),
                 Tables\Columns\TextColumn::make('date_of_birth')

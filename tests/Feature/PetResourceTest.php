@@ -1,10 +1,10 @@
 <?php
 
 use App\Models\User;
-use Illuminate\Database\Eloquent\Factories\Sequence;
-use function Pest\Laravel\get;
 use App\Filament\Owner\Resources\PetResource;
 use App\Models\Pet;
+
+use function Pest\Laravel\get;
 
 use function Pest\Laravel\actingAs;
 use function Pest\Laravel\seed;
@@ -60,12 +60,35 @@ it('only show pets for the current owner', function () {
         ->for($this->ownerUser, relationship: 'owner')
         ->create();
 
-    $otherPet = Pet::factory()
-        ->for(\App\Models\Role::whereName('owner')->first(), relationship: 'owner')
-        ->create();
+    $otherOwner = User::factory()->role('owner')->create();
+
+        $otherPet = Pet::factory()
+            ->for($otherOwner, relationship: 'owner')
+            ->create();
 
     Livewire\Livewire::test(PetResource\Pages\ListPets::class)
         ->assertSeeText($myPet->name)
         ->assertDontSeeText($otherPet->name);
 
+});
+
+it('can create pet', function () {
+    $newPet = Pet::factory()
+        ->for($this->ownerUser, relationship: 'owner')
+        ->make();
+
+    \Livewire\Livewire::test(PetResource\Pages\CreatePet::class)
+        ->fillForm([
+            'name' => $newPet->name,
+            'date_of_birth' => $newPet->date_of_birth,
+            'type' => $newPet->type,
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $this->assertDatabaseHas(Pet::class, [
+        'name' => $newPet->name,
+        'date_of_birth' => $newPet->date_of_birth,
+        'type' => $newPet->type,
+    ]);
 });

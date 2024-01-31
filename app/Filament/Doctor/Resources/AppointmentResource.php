@@ -6,8 +6,6 @@ use App\Enums\AppointmentStatus;
 use App\Filament\Doctor\Resources\AppointmentResource\Pages;
 use App\Filament\Doctor\Resources\AppointmentResource\RelationManagers\NotesRelationManager;
 use App\Models\Appointment;
-use App\Models\Clinic;
-use App\Models\Role;
 use App\Models\Slot;
 use Filament\Facades\Filament;
 use Filament\Forms;
@@ -17,7 +15,6 @@ use Filament\Forms\Set;
 use Filament\Resources\Resource;
 use Filament\Tables;
 use Filament\Tables\Table;
-use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Carbon;
 use Illuminate\Support\HtmlString;
 
@@ -40,7 +37,7 @@ class AppointmentResource extends Resource
                         ->searchable()
                         ->preload()
                         ->required()
-                        ->helperText(fn() => Filament::getTenant()->pets->isEmpty()
+                        ->helperText(fn () => Filament::getTenant()->pets->isEmpty()
                             ? new HtmlString('<span class="text-sm text-danger-600">No pets available</span>')
                             : '')
                         ->columnSpanFull(),

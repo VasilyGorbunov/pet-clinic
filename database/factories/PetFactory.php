@@ -4,9 +4,7 @@ namespace Database\Factories;
 
 use App\Enums\PetType;
 use App\Models\Pet;
-use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Carbon;
 
 class PetFactory extends Factory
 {

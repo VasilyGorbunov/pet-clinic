@@ -3,7 +3,6 @@
 namespace App\Filament\Resources;
 
 use App\Filament\Resources\PetResource\Pages;
-use App\Models\Clinic;
 use App\Models\Pet;
 use Filament\Forms;
 use Filament\Forms\Form;
