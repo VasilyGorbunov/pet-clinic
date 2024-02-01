@@ -15,21 +15,29 @@ beforeEach(function () {
     actingAs($this->ownerUser);
 });
 
-it('it renders the index page', function () {
+it('renders the index page', function () {
     get(PetResource::getUrl('index', panel: 'owner'))
         ->assertOk();
 });
 
-it('it renders the create page', function () {
+it('renders the create page', function () {
     get(PetResource::getUrl('create', panel: 'owner'))
         ->assertOk();
 });
 
-it('it renders the edit page', function () {
-    $pet = Pet::factory()->create();
+it('renders the edit page', function () {
+    $pet = Pet::factory()
+        ->for($this->ownerUser, relationship: 'owner')
+        ->create();
 
     get(PetResource::getUrl('edit', ['record' => $pet], panel: 'owner'))
         ->assertOk();
+});
+
+it('cannot edit pets that do not belong to the owner', function () {
+    $pet = Pet::factory()->create();
+    get(PetResource::getUrl('edit', ['record' => $pet], panel: 'owner'))
+        ->assertStatus(403);
 });
 
 it('can list pets', function () {
@@ -157,4 +165,52 @@ it('can update the pet', function () {
         ->name->toBe($newPetData->name)
         ->date_of_birth->format(config('app.date_format'))->toBe($newPetData->date_of_birth->format(config('app.date_format')))
         ->type->value->toBe($newPetData->type->value);
+});
+
+it('validate form errors on edit', function (Pet $updatedPet) {
+    $pet = Pet::factory()
+        ->for($this->ownerUser, relationship: 'owner')
+        ->create();
+
+
+    \Livewire\Livewire::test(PetResource\Pages\EditPet::class, [
+        'record' => $pet->getRouteKey()
+    ])
+        ->fillForm([
+            'name' => $updatedPet->name,
+            'date_of_birth' => $updatedPet->date_of_birth,
+            'type' => $updatedPet->type,
+        ])
+        ->call('save')
+        ->assertHasFormErrors();
+
+})->with([
+    [fn() => Pet::factory()->state(['name' => null])->make(), 'Missing name'],
+    [fn() => Pet::factory()->state(['date_of_birth' => null])->make(), 'Missing date of birth'],
+    [fn() => Pet::factory()->state(['type' => null])->make(), 'Missing type'],
+]);
+
+it('can delete a pet from the edit pet form', function () {
+    $pet = Pet::factory()
+        ->for($this->ownerUser, relationship: 'owner')
+        ->create();
+
+    \Livewire\Livewire::test(PetResource\Pages\EditPet::class, [
+        'record' => $pet->getRouteKey(),
+    ])
+    ->callAction(\Filament\Actions\DeleteAction::class);
+
+    $this->assertModelMissing($pet);
+});
+
+it('can delete a pet from the list of pets', function () {
+    $pet = Pet::factory()
+        ->for($this->ownerUser, relationship: 'owner')
+        ->create();
+
+    \Livewire\Livewire::test(PetResource\Pages\ListPets::class)
+        ->assertTableActionVisible('delete', $pet)
+        ->callTableAction(\Filament\Actions\DeleteAction::class, $pet);
+
+    $this->assertModelMissing($pet);
 });
