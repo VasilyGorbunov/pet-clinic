@@ -17,7 +17,7 @@ class ScheduleFactory extends Factory
         return [
           'created_at' => Carbon::now(),
           'updated_at' => Carbon::now(),
-          'day_of_week' => $this->faker->word(),
+          'day_of_week' => 1,
 
           'owner_id' => User::factory(),
           'clinic_id' => Clinic::factory(),

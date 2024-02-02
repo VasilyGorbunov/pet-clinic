@@ -7,6 +7,7 @@ use App\Filament\Owner\Resources\PetResource\Pages;
 use App\Models\Pet;
 use Filament\Facades\Filament;
 use Filament\Forms\Components\DatePicker;
+use Filament\Forms\Components\FileUpload;
 use Filament\Forms\Components\Select;
 use Filament\Forms\Components\TextInput;
 use Filament\Forms\Form;
@@ -25,6 +26,9 @@ class PetResource extends Resource
     {
         return $form
             ->schema([
+                FileUpload::make('avatar')
+                    ->image()
+                    ->imageEditor(),
                 TextInput::make('name')
                     ->required(),
                 DatePicker::make('date_of_birth')

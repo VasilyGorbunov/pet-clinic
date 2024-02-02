@@ -4,6 +4,7 @@ use App\Models\User;
 use App\Filament\Owner\Resources\PetResource;
 use App\Models\Pet;
 
+use Illuminate\Http\UploadedFile;
 use function Pest\Laravel\get;
 
 use function Pest\Laravel\actingAs;
@@ -198,7 +199,7 @@ it('can delete a pet from the edit pet form', function () {
     \Livewire\Livewire::test(PetResource\Pages\EditPet::class, [
         'record' => $pet->getRouteKey(),
     ])
-    ->callAction(\Filament\Actions\DeleteAction::class);
+        ->callAction(\Filament\Actions\DeleteAction::class);
 
     $this->assertModelMissing($pet);
 });
@@ -213,4 +214,27 @@ it('can delete a pet from the list of pets', function () {
         ->callTableAction(\Filament\Actions\DeleteAction::class, $pet);
 
     $this->assertModelMissing($pet);
+});
+
+it('can upload pet image', function () {
+    $newPet = Pet::factory()
+        ->for($this->ownerUser, relationship: 'owner')
+        ->make();
+
+    Storage::fake('avatars');
+    $file = UploadedFile::fake()->image('avatar.png');
+
+    \Livewire\Livewire::test(PetResource\Pages\CreatePet::class)
+        ->fillForm([
+            'name' => $newPet->name,
+            'date_of_birth' => $newPet->date_of_birth,
+            'type' => $newPet->type,
+            'avatar' => $file
+        ])
+        ->call('create')
+        ->assertHasNoFormErrors();
+
+    $file->storeAs('/', $file->name, 'avatars');
+
+    Storage::disk('avatars')->assertExists($file->name);
 });

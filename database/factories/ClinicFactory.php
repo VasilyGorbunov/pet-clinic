@@ -17,7 +17,12 @@ class ClinicFactory extends Factory
     public function definition(): array
     {
         return [
-            //
+            'name' => fake()->word(),
+            'address' => fake()->address(),
+            'zip' => fake()->postcode(),
+            'phone' => fake()->phoneNumber(),
+            'created_at' => now(),
+            'updated_at' => now(),
         ];
     }
 }

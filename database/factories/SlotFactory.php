@@ -2,6 +2,7 @@
 
 namespace Database\Factories;
 
+use App\Enums\AppointmentStatus;
 use App\Models\Schedule;
 use App\Models\Slot;
 use Illuminate\Database\Eloquent\Factories\Factory;
@@ -16,7 +17,7 @@ class SlotFactory extends Factory
         return [
           'start' => Carbon::now(),
           'end' => Carbon::now(),
-          'status' => $this->faker->word(),
+          'status' => AppointmentStatus::Created,
           'created_at' => Carbon::now(),
           'updated_at' => Carbon::now(),
 
